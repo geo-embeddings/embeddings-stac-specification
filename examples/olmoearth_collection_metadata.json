@@ -1,0 +1,81 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://github.com/geo-embeddings/embeddings"
+  ],
+  "type": "Collection",
+  "id": "olmoearth-v1-base-s2-embeddings",
+  "version": "1.0.0",
+  "title": "OlmoEarth v1 Base Sentinel-2 Embeddings",
+  "description": "Pixel-level 768-dimensional embeddings generated from Sentinel-2 L2A imagery using the OlmoEarth v1 Base encoder. Embeddings are computed at the native input resolution (patch_size=1) using sliding-window inference with overlap merging.",
+  "license": "OlmoEarth Artifact License",
+
+  "extent": {
+    "spatial": {
+      "bbox": [[5.1062, 51.8337, 5.2593, 51.9229]]
+    },
+    "temporal": {
+      "interval": [["2025-01-01T00:00:00Z", "2025-12-31T23:59:59Z"]]
+    }
+  },
+
+  "emb:version": "0.1.0",
+  "emb:type": "pixel",
+  "emb:dimensions": 768,
+  "emb:dtype": "int8",
+  "emb:spatial_resolution": 10,
+  "emb:temporal_resolution": "annual",
+  "emb:fit_for_use": ["classification", "segmentation"],
+  "emb:spatial_coverage": "global",
+
+  "links": [
+    {
+      "rel": "emb:model",
+      "href": "https://huggingface.co/allenai/OlmoEarth-v1-Base",
+      "type": "text/html",
+      "title": "OlmoEarth v1 Base model on Hugging Face"
+    },
+    {
+      "rel": "emb:source-data",
+      "href": "https://registry.opendata.aws/sentinel-2-l2a-cogs/",
+      "type": "text/html",
+      "title": "Sentinel-2 L2A"
+    },
+    {
+      "rel": "emb:paper",
+      "href": "https://arxiv.org/abs/2511.13655",
+      "type": "text/html",
+      "title": "OlmoEarth: Stable Latent Image Modeling for Multimodal Earth Observation"
+    },
+    {
+      "rel": "license",
+      "href": "https://github.com/allenai/olmoearth_pretrain/blob/main/LICENSE",
+      "type": "text/html",
+      "title": "OlmoEarth Artifact License"
+    }
+  ],
+
+  "item_properties": {
+    "emb:preprocessing": {
+      "normalization": "olmoearth_pretrain.norm.OlmoEarthNormalize — per-band mean/std, std_multiplier=2.0"
+    },
+    "emb:postprocessing": {
+      "quantization": "PowerQuantizeValueTransform (int8, power=2.0, scale=127.5, nodata=-128)"
+    },
+    "emb:runtime_parameters": {
+      "source_bands": ["B02", "B03", "B04", "B08", "B05", "B06", "B07", "B8A", "B11", "B12", "B01", "B09"],
+      "patch_size": 1,
+      "crop_size": 16,
+      "overlap_pixels": 2,
+      "downsample_factor": 1
+    }
+  },
+
+  "asset_properties": {
+    "emb:quantization": {
+      "method": "PowerQuantizeValueTransform (int8, power=2.0, scale=127.5, nodata=-128)",
+      "original_dtype": "float32"
+    },
+    "emb:crs": "varies (UTM zone of source imagery)"
+  }
+}
