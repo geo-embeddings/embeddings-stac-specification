@@ -24,6 +24,8 @@ It describes the produced embeddings and run metadata and does not redefine STAC
 - STAC Item JSON Schema: <https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json>
 - STAC Collection JSON Schema: <https://schemas.stacspec.org/v1.0.0/collection-spec/json-schema/collection.json>
 - STAC MLM Extension: <https://github.com/stac-extensions/mlm>
+- STAC Processing Extension: <https://github.com/stac-extensions/processing>
+- STAC Projection Extension: <https://github.com/stac-extensions/projection>
 
 ## Reuse of Core STAC Elements
 
@@ -46,15 +48,13 @@ The extension fields can be used in:
 | Field Name | Type | Description |
 | --- | --- | --- |
 | emb:version | string | **REQUIRED**. Version of this embedding extension implemented by the collection. |
-| emb:type | string enum | **REQUIRED**. Embedding type: `pixel` or `patch`. |
+| emb:type | string enum | **REQUIRED**. Embedding type: `pixel` or `chip`. |
 | emb:dimensions | integer | **REQUIRED**. Number of embedding dimensions (for example, 64, 128, 768, 1024). |
 | emb:dtype | string | **REQUIRED**. Data type of stored embeddings (for example, `float32`, `int8`, `uint16`). |
-| emb:shape | \[integer] | Shape of one embedding vector/tensor. |
 | emb:spatial_resolution | number | Ground sample distance or spatial extent per embedding, in meters. |
-| emb:patch_layout | [Patch Layout Object](#patch-layout-object) | Patch extraction layout for patch embeddings. |
+| emb:chip_layout | [Chip Layout Object](#chip-layout-object) | Chip extraction layout for chip embeddings. |
 | emb:temporal_resolution | string | Temporal compositing window. |
 | emb:fit_for_use | \[string] | Intended use cases (for example, `classification`, `change_detection`, `retrieval`). |
-| emb:spatial_coverage | string | Geographic scope (for example, `global`, `continental`, `regional`, `local`). |
 | emb:uncertainty | [Uncertainty Object](#uncertainty-object) | Optional uncertainty metadata. |
 
 ### Item Property Fields
@@ -63,32 +63,31 @@ The extension fields can be used in:
 | --- | --- | --- |
 | emb:runtime_parameters | object | Runtime parameter values used during inference. |
 | emb:inference_datetime | string (date-time) | Timestamp when the embeddings were generated. |
-| emb:source_data | \[Link Object] | Source imagery items/scenes used for this embedding item. |
-| emb:source_data_hash | string | Source data hash for reproducibility verification. |
 | emb:processing_baseline | string | Source processing baseline version. |
-| emb:preprocessing | object or string | Preprocessing expression; SHOULD follow STAC MLM processing expression format. |
-| emb:postprocessing | object or string | Postprocessing expression; SHOULD follow STAC MLM processing expression format. |
-| emb:fit_for_use | \[string] | Intended use cases. |
-| emb:spatial_coverage | string | Geographic scope. |
+| emb:preprocessing | [Processing Expression](https://github.com/stac-extensions/processing) | Preprocessing applied to source data before inference. Uses the STAC Processing extension expression format. |
+| emb:postprocessing | [Processing Expression](https://github.com/stac-extensions/processing) | Postprocessing applied to raw model output. Uses the STAC Processing extension expression format. |
 | emb:uncertainty | [Uncertainty Object](#uncertainty-object) | Optional uncertainty metadata. |
+
+Source imagery used to produce an item's embeddings SHOULD be referenced via a link with `rel: "emb:source-data"` in the item's `links` array (see [Relation Types](#relation-types)).
 
 ### Asset Fields
 
 | Field Name | Type | Description |
 | --- | --- | --- |
 | emb:quantization | [Quantization Object](#quantization-object) | Quantization details for encoded embeddings. |
-| emb:crs | string | CRS of the asset (for example, `EPSG:4326`). |
 
-### Patch Layout Object
+The CRS of an asset SHOULD be embedded in the data file itself. Use the [STAC Projection Extension](https://github.com/stac-extensions/projection) for CRS metadata in STAC rather than a custom field.
+
+### Chip Layout Object
 
 | Field Name | Type | Description |
 | --- | --- | --- |
 | layout_type | string enum | **REQUIRED**. One of `regular_grid`, `variable_grid`, `named_grid`. |
-| patch_size | integer or \[integer] | Patch size in pixels (`[height, width]` or scalar square size). |
-| stride | integer or \[integer] | Step between neighboring patches in pixels. |
+| chip_size | integer or \[integer] | Chip size in pixels (`[height, width]` or scalar square size). |
+| stride | integer or \[integer] | Step between neighboring chips in pixels. |
 | grid_id | string | Identifier of the tiling/grid system. |
 | grid_definition | Link Object | Link to grid/tiling definition. |
-| patch_geometries | Link Object | Link to per-patch geometry definitions. |
+| chip_geometries | Link Object | Link to per-chip geometry definitions. |
 
 ### Quantization Object
 
@@ -114,7 +113,7 @@ The following relation types should be used as applicable `rel` values in STAC L
 | Type | Required | Description |
 | --- | --- | --- |
 | emb:model | Yes (Collection) | Link to the encoder model. If available, this should point to a STAC MLM Item. |
-| emb:source-data | Yes (Collection) | Link to the source data collection. |
+| emb:source-data | Yes (Collection), No (Item) | Link to the source data collection (Collection) or specific source scene(s) (Item). |
 | emb:decoder | No | Link to a decoder model if one exists. |
 | emb:paper | No | Link to model or dataset paper. |
 | emb:benchmark | No | Link to benchmark/evaluation resources. |
