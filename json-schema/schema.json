@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://stac-extensions.github.io/embeddings/v1.0.0/schema.json#",
+  "$id": "https://stac-extensions.github.io/embeddings/v0.0.1/schema.json#",
   "title": "Embedding Extension",
   "description": "STAC Embedding Extension for STAC Items and STAC Collections.",
   "oneOf": [
@@ -49,7 +49,6 @@
           "type": "object",
           "required": [
             "type",
-            "emb:version",
             "emb:type",
             "emb:dimensions",
             "emb:dtype",
@@ -139,7 +138,7 @@
         "stac_extensions": {
           "type": "array",
           "contains": {
-            "const": "https://stac-extensions.github.io/embeddings/v1.0.0/schema.json"
+            "const": "https://stac-extensions.github.io/embeddings/v0.0.1/schema.json"
           }
         }
       }
@@ -202,9 +201,6 @@
           "type": "string"
         },
         "grid_definition": {
-          "$ref": "#/definitions/stac_link_object"
-        },
-        "chip_geometries": {
           "$ref": "#/definitions/stac_link_object"
         }
       },
@@ -273,9 +269,6 @@
     "collection_fields": {
       "type": "object",
       "properties": {
-        "emb:version": {
-          "type": "string"
-        },
         "emb:type": {
           "type": "string",
           "enum": [

@@ -2,7 +2,7 @@
   "stac_version": "1.0.0",
   "stac_extensions": [
     "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/embeddings/v1.0.0/schema.json"
+    "https://stac-extensions.github.io/embeddings/v0.0.1/schema.json"
   ],
   "type": "Collection",
   "id": "prithvi-s2l2a-chip-2024",
@@ -29,7 +29,6 @@
       ]
     }
   },
-  "emb:version": "1.0.0",
   "emb:type": "chip",
   "emb:dimensions": 768,
   "emb:dtype": "float32",
