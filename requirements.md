@@ -23,13 +23,12 @@ The [STAC MLM Extension](https://github.com/stac-extensions/mlm) describes the *
 
 ### Embedding Type Taxonomy
 
-Geospatial embeddings fall into three categories (per [arXiv:2601.13134](https://arxiv.org/abs/2601.13134)):
+Geospatial embeddings in scope for this extension fall into two categories (per [arXiv:2601.13134](https://arxiv.org/abs/2601.13134)):
 
 | Type | Description | Typical Format |
 | --- | --- | --- |
 | `pixel` | Dense, per-pixel embeddings preserving full spatial detail | COG, Zarr |
 | `patch` | One embedding vector per spatial tile/chip | GeoParquet |
-| `location` | Coordinate-based embeddings (lat/lon input, vector output) | GeoParquet, tabular |
 
 The embedding type drives storage format, resolution, and cost trade-offs. A `pixel` product at 10m resolution for Africa is ~38-77 TB; a `patch` product for the same area can be under 4 GB.
 
@@ -47,15 +46,29 @@ Builds on [STAC Commons Metadata](https://github.com/radiantearth/stac-spec/blob
 | --- | --- | --- | --- |
 | id | string | **Yes** | Unique identifier for this embedding collection |
 | emb:version | string | **Yes** | Version of this embedding extension spec that the collection claims to implement |
-| emb:type | string enum | **Yes** | Embedding type: `pixel`, `patch`, or `location` |
+| emb:type | string enum | **Yes** | Embedding type: `pixel` or `patch` |
 | emb:dimensions | integer | **Yes** | Number of embedding dimensions (e.g., 64, 128, 768, 1024) |
 | emb:dtype | string | **Yes** | Data type of stored embeddings (e.g., `float32`, `int8`, `uint16`) |
 | emb:shape | \[integer] | No | Shape of a single embedding (e.g., `[768]` for patch, `[128, H, W]` for pixel) |
 | emb:spatial_resolution | number | No | Ground sample distance or spatial extent per embedding, in meters |
+| emb:patch_layout | Patch Layout Object | No | Patch extraction configuration for patch embeddings (regular or non-uniform grids, including overlap semantics) |
 | emb:temporal_resolution | string | No | Temporal compositing window (e.g., `single_acquisition`, `annual`, `quarterly`, `multi_temporal`) |
 | extent | Extent Object | **Yes** | Temporal and spatial extent (from STAC Collection spec) |
 | license | string | **Yes** | SPDX license identifier (from STAC Collection spec) |
 | assets | Assets Object | No | Collection-level assets |
+
+### Patch Layout Object
+
+This object records how patch embeddings were extracted. It supports both regular grids and non-uniform tiling schemes (e.g., grids that vary with latitude).
+
+| Field Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| layout_type | string enum | **Yes** | Patch layout strategy: `regular_grid`, `variable_grid`, or `named_grid` |
+| patch_size | integer or \[integer] | No | Patch size in pixels (single value for square patches or `[height, width]`). SHOULD be provided for `regular_grid`; MAY be omitted when patch geometry is externally defined. |
+| stride | integer or \[integer] | No | Step between neighboring patches in pixels. For `regular_grid`, if `stride < patch_size`, patches overlap. Not required for variable or externally defined grids. |
+| grid_id | string | No | Identifier of the tiling/grid system used (e.g., a MajorTom grid name/version) |
+| grid_definition | Link Object | No | Link to a formal grid specification, lookup table, or tiling definition used to generate patch footprints |
+| patch_geometries | Link Object | No | Link to per-patch geometry definitions when patch footprints are non-uniform or cannot be inferred from `patch_size`/`stride` alone |
 
 ### Collection Links
 
@@ -150,6 +163,5 @@ This section is informational and does not define normative requirements.
 
 - **Patch embeddings** are best stored in **GeoParquet** -- one geometry + one embedding array per row. This aligns with how Earth Index, Clay, and Major TOM distribute their products.
 - **Pixel embeddings** are best stored in **COG** (Cloud Optimized GeoTIFF) or **Zarr** -- raster format with embedding dimensions as bands or array variables. This is how AlphaEarth and Tessera distribute products.
-- **Location embeddings** fit naturally in **GeoParquet** or other tabular formats.
 - **CRS MUST be embedded in every data file**, not only documented in README files or external metadata. Implicit CRS assumptions are a major source of integration bugs across the ecosystem.
 - **Cloud-native formats** (COG, GeoParquet, GeoZarr) should be treated as a baseline requirement for new products to enable efficient range-request access without full downloads.
