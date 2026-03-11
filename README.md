@@ -1,7 +1,7 @@
 # STAC Embedding Extension Specification
 
 - **Title:** Embedding
-- **Identifier:** <https://stac-extensions.github.io/embeddings/v1.0.0/schema.json>
+- **Identifier:** <https://stac-extensions.github.io/embeddings/v0.0.1/schema.json>
 - **Field Name Prefix:** emb
 - **Scope:** Item, Collection
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
@@ -47,7 +47,6 @@ The extension fields can be used in:
 
 | Field Name | Type | Description |
 | --- | --- | --- |
-| emb:version | string | **REQUIRED**. Version of this embedding extension implemented by the collection. |
 | emb:type | string enum | **REQUIRED**. Embedding type: `pixel` or `chip`. |
 | emb:dimensions | integer | **REQUIRED**. Number of embedding dimensions (for example, 64, 128, 768, 1024). |
 | emb:dtype | string | **REQUIRED**. Data type of stored embeddings (for example, `float32`, `int8`, `uint16`). |
@@ -76,18 +75,15 @@ Source imagery used to produce an item's embeddings SHOULD be referenced via a l
 | --- | --- | --- |
 | emb:quantization | [Quantization Object](#quantization-object) | Quantization details for encoded embeddings. |
 
-The CRS of an asset SHOULD be embedded in the data file itself. Use the [STAC Projection Extension](https://github.com/stac-extensions/projection) for CRS metadata in STAC rather than a custom field.
-
 ### Chip Layout Object
 
 | Field Name | Type | Description |
 | --- | --- | --- |
 | layout_type | string enum | **REQUIRED**. One of `regular_grid`, `variable_grid`, `named_grid`. |
 | chip_size | integer or \[integer] | Chip size in pixels (`[height, width]` or scalar square size). |
-| stride | integer or \[integer] | Step between neighboring chips in pixels. |
+| stride | integer or \[integer] | Step between the origins of neighboring chips in pixels (`[row_stride, col_stride]` or scalar for square stride). When `stride < chip_size`, chips overlap; when `stride == chip_size`, chips tile without overlap. |
 | grid_id | string | Identifier of the tiling/grid system. |
 | grid_definition | Link Object | Link to grid/tiling definition. |
-| chip_geometries | Link Object | Link to per-chip geometry definitions. |
 
 ### Quantization Object
 

@@ -48,7 +48,6 @@ Builds on [STAC Commons Metadata](https://github.com/radiantearth/stac-spec/blob
 | Field Name              | Type                | Required | Description                                                                                                     |
 | ----------------------- | ------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
 | id                      | string              | **Yes**  | Unique identifier for this embedding collection                                                                 |
-| emb:version             | string              | **Yes**  | Version of this embedding extension spec that the collection claims to implement                                |
 | emb:type                | string enum         | **Yes**  | Embedding type: `pixel` or `chip`                                                                               |
 | emb:dimensions          | integer             | **Yes**  | Number of embedding dimensions (e.g., 64, 128, 768, 1024)                                                       |
 | emb:dtype               | string              | **Yes**  | Data type of stored embeddings (e.g., `float32`, `int8`, `uint16`)                                              |
@@ -72,7 +71,6 @@ This object records how chip embeddings were extracted. It supports both regular
 | stride           | integer or integer] | No       | Step between neighboring chips in pixels. For `regular_grid`, if `stride < chip_size`, chips overlap. Not required for variable or externally defined grids.                 |
 | grid_id          | string              | No       | Identifier of the tiling/grid system used (e.g., a MajorTom grid name/version)                                                                                                |
 | grid_definition  | Link Object         | No       | Link to a formal grid specification, lookup table, or tiling definition used to generate chip footprints                                                                      |
-| chip_geometries  | Link Object         | No       | Link to per-chip geometry definitions when chip footprints are non-uniform or cannot be inferred from `chip_size`/`stride` alone                                              |
 
 
 ### Collection Links
