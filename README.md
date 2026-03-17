@@ -107,6 +107,7 @@ No extension-specific fields are defined on assets.
 | --- | --- | --- |
 | method | string | **REQUIRED**. Quantization method. |
 | original_dtype | string | **REQUIRED**. Original data type before quantization. Uses the same [data type values](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#data-types) as `data_type`. |
+| quantized_dtype | string | Data type after quantization. Uses the same [data type values](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#data-types) as `data_type`. |
 | scale | number or \[number] | Dequantization scale factor(s). |
 | offset | number or \[number] | Dequantization offset(s). |
 | link | [Link Object](https://github.com/radiantearth/stac-spec/blob/master/commons/links.md) | Link to a document describing the quantization method in detail. Recommended when the method cannot be fully captured by `scale` and `offset` alone. |

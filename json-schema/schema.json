@@ -252,6 +252,9 @@
             }
           ]
         },
+        "quantized_dtype" : {
+          "type": "string"
+        },
         "link": {
           "$ref": "#/definitions/stac_link_object"
         }
