@@ -8,6 +8,8 @@
   - [STAC Commons Metadata](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md)
   - [STAC Collection Spec](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md)
   - [STAC MLM Extension](https://github.com/stac-extensions/mlm)
+  - [STAC Processing Extension](https://github.com/stac-extensions/processing)
+  - [STAC Scientific Extension](https://github.com/stac-extensions/scientific)
   - [GeoParquet](https://geoparquet.org/)
   - [GeoZarr](https://github.com/zarr-developers/geozarr-spec)
 
@@ -50,8 +52,8 @@ Builds on [STAC Commons Metadata](https://github.com/radiantearth/stac-spec/blob
 | id                      | string              | **Yes**  | Unique identifier for this embedding collection                                                                 |
 | emb:type                | string enum         | **Yes**  | Embedding type: `pixel` or `chip`                                                                               |
 | emb:dimensions          | integer             | **Yes**  | Number of embedding dimensions (e.g., 64, 128, 768, 1024)                                                       |
-| emb:dtype               | string              | **Yes**  | Data type of stored embeddings (e.g., `float32`, `int8`, `uint16`)                                              |
-| emb:spatial_resolution  | number              | No       | Ground sample distance or spatial extent per embedding, in meters                                               |
+| data_type               | string              | **Yes**  | Data type of stored embeddings (e.g., `float32`, `int8`, `uint16`). Uses [STAC Common Metadata `data_type`](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#data-types). |
+| gsd                     | number              | No       | Ground sample distance or spatial extent per embedding, in meters. Uses [STAC Common Metadata `gsd`](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#gsd). |
 | emb:chip_layout         | Chip Layout Object  | No       | Chip extraction configuration for chip embeddings (regular or non-uniform grids, including overlap semantics)   |
 | emb:temporal_resolution | string              | No       | Temporal compositing window (e.g., `single_acquisition`, `annual`, `quarterly`, `multi_temporal`)               |
 | extent                  | Extent Object       | **Yes**  | Temporal and spatial extent (from STAC Collection spec)                                                         |
@@ -67,8 +69,8 @@ This object records how chip embeddings were extracted. It supports both regular
 | Field Name       | Type                | Required | Description                                                                                                                                                                   |
 | ---------------- | ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | layout_type      | string enum         | **Yes**  | Chip layout strategy: `regular_grid`, `variable_grid`, or `named_grid`                                                                                                        |
-| chip_size        | integer or integer] | No       | Chip size in pixels (single value for square chips or `[height, width]`). SHOULD be provided for `regular_grid`; MAY be omitted when chip geometry is externally defined.    |
-| stride           | integer or integer] | No       | Step between neighboring chips in pixels. For `regular_grid`, if `stride < chip_size`, chips overlap. Not required for variable or externally defined grids.                 |
+| chip_size        | \[integer]           | No       | Chip size in pixels as `[height, width]`. SHOULD be provided for `regular_grid`; MAY be omitted when chip geometry is externally defined.    |
+| stride           | \[integer]           | No       | Step between neighboring chips in pixels as `[row_stride, col_stride]`. For `regular_grid`, if `stride < chip_size`, chips overlap. Not required for variable or externally defined grids. |
 | grid_id          | string              | No       | Identifier of the tiling/grid system used (e.g., a MajorTom grid name/version)                                                                                                |
 | grid_definition  | Link Object         | No       | Link to a formal grid specification, lookup table, or tiling definition used to generate chip footprints                                                                      |
 
@@ -83,8 +85,9 @@ The collection MUST include an array of links using the following relation types
 | emb:model       | **Yes**  | Link to the encoder model. If the model is described as a STAC MLM Item, the link SHOULD point to that Item. |
 | emb:decoder     | No       | Link to a decoder model, if one exists                                                                       |
 | emb:source-data | **Yes**  | Link to the source data collection (e.g., Sentinel-2-L2A)                                                    |
-| emb:paper       | No       | Link to the model or dataset paper                                                                           |
 | emb:benchmark   | No       | Link to an evaluation benchmark for the embeddings                                                           |
+
+Paper and citation references SHOULD use the [Scientific Extension](https://github.com/stac-extensions/scientific) fields (`sci:doi`, `sci:citation`, `sci:publications`) instead of a custom link relation type.
 
 
 If the linked model is a STAC MLM Item, the collection SHOULD also reference which MLM input and output specifications were used for generating these embeddings.
@@ -101,8 +104,8 @@ An item represents a single spatiotemporal partition of the collection -- a tile
 | Field Name              | Type               | Required | Description                                                                                                                                                 |
 | ----------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | emb:runtime_parameters  | object             | No       | The specific parameter values used for this inference run (e.g., input bands, chip size, stride, temporal window). Structure is model-dependent.            |
-| emb:inference_datetime  | string (date-time) | No       | When the embeddings were generated                                                                                                                          |
-| emb:processing_baseline | string             | No       | Source data processing baseline version (e.g., Sentinel-2 processing baseline)                                                                              |
+| processing:datetime     | string (date-time) | No       | When the embeddings were generated. Uses the [Processing Extension](https://github.com/stac-extensions/processing).                                         |
+| processing:version      | string             | No       | Source data processing baseline version (e.g., Sentinel-2 processing baseline). Uses the [Processing Extension](https://github.com/stac-extensions/processing). |
 | emb:preprocessing       | Processing Object  | No       | How source data was prepared before model inference. Uses the [STAC Processing extension](https://github.com/stac-extensions/processing) expression format. |
 | emb:postprocessing      | Processing Object  | No       | Transformations applied to raw model output (dimension reduction, normalization, quantization pipeline). Uses the STAC Processing extension expression format. |
 | emb:quantization        | Quantization Object| No       | Quantization details, if the embeddings have been quantized from their original dtype                          |
@@ -143,10 +146,12 @@ If embeddings have been quantized (e.g., from `float32` to `int8`), the quantiza
 
 | Field Name     | Type              | Required | Description                                                                                  |
 | -------------- | ----------------- | -------- | -------------------------------------------------------------------------------------------- |
-| method         | string            | **Yes**  | Quantization method: `none`, `linear`, `sqrt_scale`, `quantization_aware_training`, or other |
-| original_dtype | string            | **Yes**  | The data type before quantization (e.g., `float32`)                                          |
-| scale          | number or number] | No       | Dequantization scale factor(s)                                                               |
-| offset         | number or number] | No       | Dequantization offset(s)                                                                     |
+| method          | string            | **Yes**  | Quantization method: `none`, `linear`, `sqrt_scale`, `quantization_aware_training`, or other |
+| original_dtype  | string            | **Yes**  | The data type before quantization (e.g., `float32`). Uses the same [data type values](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#data-types) as `data_type`. |
+| quantized_dtype | string            | No       | The data type after quantization (e.g., `int8`). Uses the same [data type values](https://github.com/radiantearth/stac-spec/blob/master/commons/common-metadata.md#data-types) as `data_type`. |
+| scale           | \[number]          | No       | Dequantization scale factor(s)                                                               |
+| offset          | \[number]          | No       | Dequantization offset(s)                                                                     |
+| link            | Link Object       | No       | Link to a document describing the quantization method in detail. Recommended when the method cannot be fully captured by `scale` and `offset` alone. |
 
 
 ---
@@ -174,7 +179,8 @@ Uncertainty quantification for embeddings is an emerging area. The extension pro
 | --------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------- |
 | emb:uncertainty.method      | string      | No       | How uncertainty is quantified (e.g., `ensemble_variance`, `mc_dropout`, `calibration_score`) |
 | emb:uncertainty.description | string      | No       | Human-readable description of uncertainty characteristics or limitations                     |
-| emb:uncertainty.asset       | Link Object | No       | Link to a companion uncertainty data asset                                                   |
+
+Companion uncertainty data SHOULD be provided as a STAC Asset with the role `"uncertainty"` in the item's or collection's `assets` object.
 
 
 ---

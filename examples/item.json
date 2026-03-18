@@ -1,7 +1,8 @@
 {
   "stac_version": "1.0.0",
   "stac_extensions": [
-    "https://stac-extensions.github.io/embeddings/v0.0.1/schema.json"
+    "https://stac-extensions.github.io/embeddings/v0.0.1/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
   ],
   "type": "Feature",
   "id": "tile-12txm-2024-05-01",
@@ -51,8 +52,8 @@
       "chip_size": 16,
       "stride": 16
     },
-    "emb:inference_datetime": "2025-01-10T11:22:33Z",
-    "emb:processing_baseline": "sentinel-2-l2a-pb05",
+    "processing:datetime": "2025-01-10T11:22:33Z",
+    "processing:version": "sentinel-2-l2a-pb05",
     "emb:preprocessing": {
       "format": "gdal-calc",
       "expression": "scale_to_reflectance,cloud_mask"
@@ -64,8 +65,19 @@
     "emb:quantization": {
       "method": "linear",
       "original_dtype": "float32",
-      "scale": 0.02,
-      "offset": -1.2
+      "quantized_dtype": "int8",
+      "scale": [
+        0.02
+      ],
+      "offset": [
+        -1.2
+      ],
+      "link": {
+        "rel": "about",
+        "href": "https://example.org/docs/linear-quantization-method",
+        "type": "text/html",
+        "title": "Linear quantization method documentation"
+      }
     }
   },
   "links": [

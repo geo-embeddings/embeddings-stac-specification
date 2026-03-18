@@ -55,7 +55,7 @@
             "type",
             "emb:type",
             "emb:dimensions",
-            "emb:dtype",
+            "data_type",
             "links"
           ],
           "properties": {
@@ -151,7 +151,7 @@
       "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json#/definitions/link"
     },
     "processing_expression": {
-      "$ref": "https://stac-extensions.github.io/processing/v1.1.0/schema.json#/definitions/fields/properties/processing:expression"
+      "$ref": "https://stac-extensions.github.io/processing/v1.2.0/schema.json#/definitions/fields/properties/processing:expression"
     },
     "chip_layout": {
       "type": "object",
@@ -168,38 +168,22 @@
           ]
         },
         "chip_size": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "minItems": 2,
-              "maxItems": 2
-            }
-          ]
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2
         },
         "stride": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "minItems": 2,
-              "maxItems": 2
-            }
-          ]
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2
         },
         "grid_id": {
           "type": "string"
@@ -227,30 +211,22 @@
           "type": "string"
         },
         "scale": {
-          "oneOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          ]
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
         },
         "offset": {
-          "oneOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          ]
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "quantized_dtype" : {
+          "type": "string"
+        },
+        "link": {
+          "$ref": "#/definitions/stac_link_object"
         }
       },
       "additionalProperties": false
@@ -263,9 +239,6 @@
         },
         "description": {
           "type": "string"
-        },
-        "asset": {
-          "$ref": "#/definitions/stac_link_object"
         }
       },
       "additionalProperties": false
@@ -284,10 +257,10 @@
           "type": "integer",
           "minimum": 1
         },
-        "emb:dtype": {
+        "data_type": {
           "type": "string"
         },
-        "emb:spatial_resolution": {
+        "gsd": {
           "type": "number"
         },
         "emb:chip_layout": {
@@ -316,13 +289,6 @@
       "properties": {
         "emb:runtime_parameters": {
           "type": "object"
-        },
-        "emb:inference_datetime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "emb:processing_baseline": {
-          "type": "string"
         },
         "emb:preprocessing": {
           "$ref": "#/definitions/processing_expression"
@@ -364,8 +330,8 @@
       "properties": {
         "emb:type": {},
         "emb:dimensions": {},
-        "emb:dtype": {},
-        "emb:spatial_resolution": {},
+        "data_type": {},
+        "gsd": {},
         "emb:temporal_resolution": {},
         "emb:fit_for_use": {},
         "emb:uncertainty": {}
