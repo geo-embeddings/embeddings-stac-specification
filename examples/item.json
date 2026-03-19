@@ -62,6 +62,15 @@
       "format": "gdal-calc",
       "expression": "l2_normalize"
     },
+    "emb:energy": {
+      "gpu_energy_kwh": 0.0007124142254234144,
+      "inference_duration_s": 22.12,
+      "avg_gpu_power_w": 116,
+      "max_gpu_power_w": 131,
+      "gpu_name": "AMD Radeon Graphics",
+      "instance_type": null,
+      "platform": null
+    },
     "emb:quantization": {
       "method": "linear",
       "original_dtype": "float32",

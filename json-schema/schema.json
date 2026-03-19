@@ -231,6 +231,37 @@
       },
       "additionalProperties": false
     },
+    "energy": {
+      "type": "object",
+      "properties": {
+        "gpu_energy_kwh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "inference_duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avg_gpu_power_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_gpu_power_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_name": {
+          "type": "string"
+        },
+        "instance_type": {
+          "type": ["string", "null"]
+        },
+        "platform": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
     "uncertainty": {
       "type": "object",
       "properties": {
@@ -310,6 +341,9 @@
         },
         "emb:quantization": {
           "$ref": "#/definitions/quantization"
+        },
+        "emb:energy": {
+          "$ref": "#/definitions/energy"
         }
       },
       "patternProperties": {
