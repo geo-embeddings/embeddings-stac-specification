@@ -79,6 +79,7 @@ The extension fields can be used in:
 | emb:postprocessing | [Processing Expression](https://github.com/stac-extensions/processing) | Postprocessing applied to raw model output. Uses the STAC Processing extension expression format. |
 | emb:uncertainty | [Uncertainty Object](#uncertainty-object) | Optional uncertainty metadata. |
 | emb:quantization | [Quantization Object](#quantization-object) | Quantization details for encoded embeddings. |
+| emb:energy | [Energy Object](#energy-object) | Energy usage metadata from the embedding inference run. |
 
 Source imagery used to produce an item's embeddings SHOULD be referenced via a link with `rel: "emb:source-data"` in the item's `links` array (see [Relation Types](#relation-types)).
 
@@ -111,6 +112,19 @@ No extension-specific fields are defined on assets.
 | scale | \[number] | Dequantization scale factor(s). |
 | offset | \[number] | Dequantization offset(s). |
 | link | [Link Object](https://github.com/radiantearth/stac-spec/blob/master/commons/links.md) | Link to a document describing the quantization method in detail. Recommended when the method cannot be fully captured by `scale` and `offset` alone. |
+
+### Energy Object
+
+| Field Name | Type | Description |
+| --- | --- | --- |
+| device_type | string | Compute device used for inference. Must be `"cpu"` or `"gpu"`. |
+| energy_kwh | number | Total energy consumed by the compute device during the inference run, in kilowatt-hours. |
+| inference_duration_s | number | Wall-clock duration of the inference run, in seconds. |
+| avg_power_w | number | Average power draw of the compute device during inference, in watts. |
+| max_power_w | number | Peak power draw of the compute device during inference, in watts. |
+| name | string | Name of the compute device used for inference (for example, `NVIDIA A100`, `Intel Xeon 8375C`). |
+| instance_type | string\|null | Cloud instance type used for inference (for example, `p4d.24xlarge`, `a2-highgpu-1g`). |
+| platform | string\|null | Name of the compute platform (for example, `aws`, `gcp`, `azure`). Defaults to `"local"` when inference was not performed on a cloud platform. |
 
 ### Uncertainty Object
 

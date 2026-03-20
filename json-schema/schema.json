@@ -231,6 +231,41 @@
       },
       "additionalProperties": false
     },
+    "energy": {
+      "type": "object",
+      "properties": {
+        "device_type": {
+          "type": "string",
+          "enum": ["cpu", "gpu"]
+        },
+        "energy_kwh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "inference_duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avg_power_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_power_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string"
+        },
+        "instance_type": {
+          "type": ["string", "null"]
+        },
+        "platform": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
     "uncertainty": {
       "type": "object",
       "properties": {
@@ -310,6 +345,9 @@
         },
         "emb:quantization": {
           "$ref": "#/definitions/quantization"
+        },
+        "emb:energy": {
+          "$ref": "#/definitions/energy"
         }
       },
       "patternProperties": {
